@@ -228,7 +228,7 @@ class get_the_data:
             self.big_count += 1
             if self.little_count == 1000:
                 print("waiting 1 hour")
-                time.sleep(3)
+                time.sleep(3600)
                 self.little_count = 1
                 self.more_data()
             else:
