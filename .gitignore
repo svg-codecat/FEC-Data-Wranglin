@@ -1,0 +1,7 @@
+# python artifacts
+__pycache__/
+.ipynb_checkpoints/
+
+# development
+env/
+.vscode/
