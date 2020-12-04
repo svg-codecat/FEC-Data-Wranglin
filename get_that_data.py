@@ -95,8 +95,8 @@ def total_pages(starting_url):
     info = json.loads(data)
     # Yes this is ridiculous but whatever
     pages = info["pagination"]["pages"]
-    pages = pages[:-2]
-    pages = pages + "00"
+    pages = pages[:-3]
+    pages = pages + "000"
     pages = int(pages)
     return pages
 
