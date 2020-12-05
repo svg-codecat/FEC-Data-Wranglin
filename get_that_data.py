@@ -1,9 +1,13 @@
 from src.data.data_fetcher import DataFetcher
 
 
+
 fetcher = DataFetcher("2020", "P")
 print(fetcher.api_starting_url_container)
 print(fetcher.gimmie_data(record_limit=5))
+
+
+#### Need to write this into the other file
 
 # Create instance of data_fetcher class class
 # fec = data_fetcher(starting_url, complete_list)
