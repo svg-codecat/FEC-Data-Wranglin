@@ -1,3 +1,4 @@
+from typing import Union
 import os
 import json
 import time
@@ -81,6 +82,30 @@ def _make_api_url(
         )
         api_key = "DEMO_KEY"
 
+    two_year_transaction_period = _handle_two_year_transaction_period(
+        two_year_transaction_period
+    )
+
+    recipient_committee_type = _handle_recipient_committee_type(
+        recipient_committee_type
+    )
+
+    starting_url = (
+        base_api_url
+        + "two_year_transaction_period="
+        + two_year_transaction_period
+        + "&api_key="
+        + api_key
+        + "&recipient_committee_type="
+        + recipient_committee_type
+        + set_parameters
+    )
+    return APIStartingURLContainer(url=starting_url)
+
+
+def _handle_two_year_transaction_period(
+    two_year_transaction_period: Union[int, str]
+) -> str:
     if two_year_transaction_period.isnumeric():
         if (int(two_year_transaction_period) % 2) == 0:
             if (
@@ -98,6 +123,10 @@ def _make_api_url(
         two_year_transaction_period = "2020"
         print("Invalid input, defaulting to 2020.")
 
+    return two_year_transaction_period
+
+
+def _handle_recipient_committee_type(recipient_committee_type: str) -> str:
     if recipient_committee_type == "H" or recipient_committee_type == "House":
         recipient_committee_type = "H"
     elif recipient_committee_type == "S" or recipient_committee_type == "Senate":
@@ -108,17 +137,7 @@ def _make_api_url(
         print("Invalid input, defaulting to Presidential")
         recipient_committee_type = "P"
 
-    starting_url = (
-        base_api_url
-        + "two_year_transaction_period="
-        + two_year_transaction_period
-        + "&api_key="
-        + api_key
-        + "&recipient_committee_type="
-        + recipient_committee_type
-        + set_parameters
-    )
-    return APIStartingURLContainer(url=starting_url)
+    return recipient_committee_type
 
 
 class DataFetcher:
