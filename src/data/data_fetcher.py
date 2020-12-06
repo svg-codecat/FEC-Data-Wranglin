@@ -106,8 +106,10 @@ def _make_api_url(
 def _handle_two_year_transaction_period(
     two_year_transaction_period: Union[int, str]
 ) -> str:
-    if two_year_transaction_period.isnumeric():
-        if (int(two_year_transaction_period) % 2) == 0:
+    if str(two_year_transaction_period).isnumeric():
+        if int(two_year_transaction_period) % 2 != 0:
+            two_year_transaction_period = int(two_year_transaction_period) + 1
+            two_year_transaction_period = str(two_year_transaction_period)
             if (
                 int(two_year_transaction_period) >= 2000
                 and int(two_year_transaction_period) <= 2020
@@ -116,6 +118,11 @@ def _handle_two_year_transaction_period(
             else:
                 two_year_transaction_period = "2020"
                 print("Invalid input, defaulting to 2020.")
+        elif (
+            int(two_year_transaction_period) >= 2000
+            and int(two_year_transaction_period) <= 2020
+            ):
+            pass  
         else:
             two_year_transaction_period = "2020"
             print("Invalid input, defaulting to 2020.")
@@ -123,7 +130,7 @@ def _handle_two_year_transaction_period(
         two_year_transaction_period = "2020"
         print("Invalid input, defaulting to 2020.")
 
-    return two_year_transaction_period
+    return str(two_year_transaction_period)
 
 
 def _handle_recipient_committee_type(recipient_committee_type: str) -> str:
