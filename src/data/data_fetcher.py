@@ -127,12 +127,10 @@ def _handle_two_year_transaction_period(
 
 
 def _handle_recipient_committee_type(recipient_committee_type: str) -> str:
-    if recipient_committee_type == "H" or recipient_committee_type == "House":
-        recipient_committee_type = "H"
-    elif recipient_committee_type == "S" or recipient_committee_type == "Senate":
-        recipient_committee_type = "S"
-    elif recipient_committee_type == "P" or recipient_committee_type == "Presidential":
-        recipient_committee_type = "P"
+    possible_types = ["H", "HOUSE", "S", "SENATE", "P", "PRESIDENTIAL"]
+    recipient_committee_type = recipient_committee_type.upper()
+    if recipient_committee_type in possible_types:
+        return recipient_committee_type[:1]
     else:
         print("Invalid input, defaulting to Presidential")
         recipient_committee_type = "P"
