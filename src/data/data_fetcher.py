@@ -110,7 +110,7 @@ def _handle_two_year_transaction_period(
         two_year_transaction_period = int(two_year_transaction_period)
         if two_year_transaction_period % 2 != 0:
             two_year_transaction_period = two_year_transaction_period + 1
-        if two_year_transaction_period in range(2000, 2020):
+        if two_year_transaction_period in range(2000, 2021):
                 return str(two_year_transaction_period)
     print("Invalid input, defaulting to 2020.")
     return "2020"
