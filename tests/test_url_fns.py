@@ -5,7 +5,41 @@ from src.data.data_fetcher import (
 
 
 class TestTransactionPeriod:
-    pass
+    def test_allows_odd(self):
+        expected = "2014"
+
+        result = _handle_two_year_transaction_period("2013")
+        assert expected == result
+
+    def test_character_error(self, capsys):
+        error_msg = "Invalid input, defaulting to 2020.\n"
+        expected = "2020"
+
+        result = _handle_two_year_transaction_period("BoB")
+        captured = capsys.readouterr().out
+        assert expected == result
+        assert captured == error_msg
+
+    def test_year_out_of_range(self, capsys):
+        error_msg = "Invalid input, defaulting to 2020.\n"
+        expected = "2020"
+
+        result = _handle_two_year_transaction_period("2021")
+        captured = capsys.readouterr().out
+        assert expected == result
+        assert captured == error_msg
+
+        expected = "2000"
+        result = _handle_two_year_transaction_period("1999")
+        captured = capsys.readouterr().out
+        assert expected == result
+        assert captured == ""
+
+    def test_allows_int(self, capsys):
+        expected = "2012"
+
+        result = _handle_two_year_transaction_period(2012)
+        assert expected == result
 
 
 class TestCommitteeType:
