@@ -107,30 +107,13 @@ def _handle_two_year_transaction_period(
     two_year_transaction_period: Union[int, str]
 ) -> str:
     if str(two_year_transaction_period).isnumeric():
-        if int(two_year_transaction_period) % 2 != 0:
-            two_year_transaction_period = int(two_year_transaction_period) + 1
-            two_year_transaction_period = str(two_year_transaction_period)
-            if (
-                int(two_year_transaction_period) >= 2000
-                and int(two_year_transaction_period) <= 2020
-            ):
-                pass
-            else:
-                two_year_transaction_period = "2020"
-                print("Invalid input, defaulting to 2020.")
-        elif (
-            int(two_year_transaction_period) >= 2000
-            and int(two_year_transaction_period) <= 2020
-            ):
-            pass  
-        else:
-            two_year_transaction_period = "2020"
-            print("Invalid input, defaulting to 2020.")
-    else:
-        two_year_transaction_period = "2020"
-        print("Invalid input, defaulting to 2020.")
-
-    return str(two_year_transaction_period)
+        two_year_transaction_period = int(two_year_transaction_period)
+        if two_year_transaction_period % 2 != 0:
+            two_year_transaction_period = two_year_transaction_period + 1
+        if two_year_transaction_period in range(2000, 2020):
+                return str(two_year_transaction_period)
+    print("Invalid input, defaulting to 2020.")
+    return "2020"
 
 
 def _handle_recipient_committee_type(recipient_committee_type: str) -> str:
