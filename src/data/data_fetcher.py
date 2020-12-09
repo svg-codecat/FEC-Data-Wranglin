@@ -2,7 +2,8 @@ from typing import Union
 import os
 import json
 import time
-import urllib.request
+import requests
+import fnmatch
 
 import pandas as pd
 
@@ -43,8 +44,8 @@ def _get_total_pages_for_call(api_starting_url_container: APIStartingURLContaine
             + " `api_starting_url_container` object, built from `make_api_url()`"
         )
 
-    uh = urllib.request.urlopen(api_starting_url_container.url)
-    data = uh.read().decode()
+    uh = requests.get(api_starting_url_container.url)
+    data = uh.text
     info = json.loads(data)
 
     pages = info["pagination"]["pages"]
@@ -110,7 +111,7 @@ def _handle_two_year_transaction_period(
         two_year_transaction_period = int(two_year_transaction_period)
         if two_year_transaction_period % 2 != 0:
             two_year_transaction_period = two_year_transaction_period + 1
-        if two_year_transaction_period in range(2000, 2021):
+        if two_year_transaction_period in range(2004, 2021):
                 return str(two_year_transaction_period)
     print("Invalid input, defaulting to 2020.")
     return "2020"
@@ -153,11 +154,14 @@ class DataFetcher:
         self.api_starting_url_container = _make_api_url(
             two_year_transaction_period, recipient_committee_type
         )
+        self.two_year_transaction_period = two_year_transaction_period
+        self.recipient_committee_type = recipient_committee_type
         self.total_pages = _get_total_pages_for_call(self.api_starting_url_container)
 
         self.starting_url = self.api_starting_url_container.url
 
         self.complete_list = []
+        self.df = None
 
         self.pages_pulled = 0
         self.api_calls_this_hour = 1  # first info page is a call
@@ -190,7 +194,8 @@ class DataFetcher:
 
             record_limit: int (optional)
                 Number of records to pull before exiting the run
-
+        Result:
+            You automagically have a DataFrame from the results of self.current_list
         """
         while self.pages_pulled < self.total_pages:
             if record_limit:
@@ -200,18 +205,19 @@ class DataFetcher:
             if self.under_rate_limit:
                 self.api_calls_this_hour += 1
 
-                self.get_next_page()
-                self.get_transactions_on_page()
+                self._get_next_page()
+                self._get_transactions_on_page()
                 
                 self.pages_pulled += 1
-                return self.complete_list
+                
 
             else:
                 print("waiting 1 hour")
                 time.sleep(sleep_timer)
                 self.api_calls_this_hour = 1
+        self._build_df()
 
-    def get_next_page(self):
+    def _get_next_page(self):
         """
         Adds two items to api_starting_url to get to the next page of transactions.
 
@@ -231,11 +237,11 @@ class DataFetcher:
         except:
             url = self.starting_url
 
-        uh = urllib.request.urlopen(url)
-        data = uh.read().decode()
+        uh = requests.get(url)
+        data = uh.text
         self.info = json.loads(data)
 
-    def get_transactions_on_page(self):
+    def _get_transactions_on_page(self):
         """
         Loops over the transactions on a page using self.info from get_next_page.
         Puts that data into current_list.
@@ -273,3 +279,26 @@ class DataFetcher:
         self.last_contribution_receipt_date = self.info["pagination"]["last_indexes"][
             "last_contribution_receipt_date"
         ]
+
+    def _build_df(self):
+        self.df = pd.DataFrame(
+            self.complete_list,
+            columns=[
+                "contributor_occupation",
+                "contributor_employer",
+                "contributor_city",
+                "contributor_state",
+                "contributor_zip",
+                "party",
+            ],
+        )
+        self.df.fillna(value="", inplace=True)
+     
+    def save_df_data(self):
+        pattern = f"*_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv"
+        files = os.listdir("data/")
+        for name in files:
+            if fnmatch.fnmatch(name, pattern):
+                os.remove("data/" + name)
+                self.df.to_csv(f'data/{self.pages_pulled}_of_{self.total_pages}_for_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv')
+        self.df.to_csv(f'data/{self.pages_pulled}_of_{self.total_pages}_for_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv') 
