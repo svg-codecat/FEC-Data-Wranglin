@@ -161,6 +161,7 @@ class DataFetcher:
         self.starting_url = self.api_starting_url_container.url
 
         self.complete_list = []
+        self.df = None
 
         self.pages_pulled = 0
         self.api_calls_this_hour = 1  # first info page is a call
@@ -193,7 +194,8 @@ class DataFetcher:
 
             record_limit: int (optional)
                 Number of records to pull before exiting the run
-
+        Result:
+            You automagically have a DataFrame from the results of self.current_list
         """
         while self.pages_pulled < self.total_pages:
             if record_limit:
@@ -203,8 +205,8 @@ class DataFetcher:
             if self.under_rate_limit:
                 self.api_calls_this_hour += 1
 
-                self.get_next_page()
-                self.get_transactions_on_page()
+                self._get_next_page()
+                self._get_transactions_on_page()
                 
                 self.pages_pulled += 1
                 
@@ -213,8 +215,9 @@ class DataFetcher:
                 print("waiting 1 hour")
                 time.sleep(sleep_timer)
                 self.api_calls_this_hour = 1
+        self._build_df()
 
-    def get_next_page(self):
+    def _get_next_page(self):
         """
         Adds two items to api_starting_url to get to the next page of transactions.
 
@@ -238,7 +241,7 @@ class DataFetcher:
         data = uh.text
         self.info = json.loads(data)
 
-    def get_transactions_on_page(self):
+    def _get_transactions_on_page(self):
         """
         Loops over the transactions on a page using self.info from get_next_page.
         Puts that data into current_list.
@@ -290,16 +293,12 @@ class DataFetcher:
             ],
         )
         self.df.fillna(value="", inplace=True)
-        return self.df
-
-    def _save_df_data(self):
-        did_write = False
+     
+    def save_df_data(self):
         pattern = f"*_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv"
         files = os.listdir("data/")
         for name in files:
             if fnmatch.fnmatch(name, pattern):
                 os.remove("data/" + name)
                 self.df.to_csv(f'data/{self.pages_pulled}_of_{self.total_pages}_for_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv')
-                did_write = True
-        if did_write != True:
-            self.df.to_csv(f'data/{self.pages_pulled}_of_{self.total_pages}_for_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv') 
+        self.df.to_csv(f'data/{self.pages_pulled}_of_{self.total_pages}_for_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv') 
