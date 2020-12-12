@@ -296,9 +296,9 @@ class DataFetcher:
      
     def save_df_data(self):
         pattern = f"*_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv"
-        files = os.listdir("data/")
+        files = os.listdir("data/raw_data")
         for name in files:
             if fnmatch.fnmatch(name, pattern):
-                os.remove("data/" + name)
-                self.df.to_csv(f'data/{self.pages_pulled}_of_{self.total_pages}_for_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv')
-        self.df.to_csv(f'data/{self.pages_pulled}_of_{self.total_pages}_for_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv') 
+                os.remove("data/raw_data/" + name)
+                self.df.to_csv(f'data/raw_data/{self.pages_pulled}_of_{self.total_pages}_for_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv')
+        self.df.to_csv(f'data/raw_data/{self.pages_pulled}_of_{self.total_pages}_for_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv') 
