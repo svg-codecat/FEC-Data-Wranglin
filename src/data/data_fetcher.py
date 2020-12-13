@@ -260,11 +260,15 @@ class DataFetcher:
             # Because there is stupid data in some transactions for ZIP, need to do this for all data to process for bad data
             try:
                 if contributor_zip.isnumeric():
+                    if len(contributor_zip) < 5:
+                        contributor_zip = 99999
+                    elif len(contributor_zip) > 5:
+                        contributor_zip = int(contributor_zip[0:5])
                     contributor_zip = int(contributor_zip)
                 else:
-                    contributor_zip = int("00000")
+                    contributor_zip = 99999
             except:
-                contributor_zip = int("00000")
+                contributor_zip = 99999
             current_list = [
                 contributor_occupation,
                 contributor_employer,
