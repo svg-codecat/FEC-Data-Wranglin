@@ -201,20 +201,23 @@ class DataFetcher:
             if record_limit:
                 if self.pages_pulled > record_limit:
                     break
+            try:
+                if self.under_rate_limit:
+                    self.api_calls_this_hour += 1
 
-            if self.under_rate_limit:
-                self.api_calls_this_hour += 1
-
-                self._get_next_page()
-                self._get_transactions_on_page()
+                    self._get_next_page()
+                    self._get_transactions_on_page()
                 
-                self.pages_pulled += 1
+                    self.pages_pulled += 1
                 
 
-            else:
-                print("waiting 1 hour")
-                time.sleep(sleep_timer)
-                self.api_calls_this_hour = 1
+                else:
+                    print(self.pages_pulled)
+                    print("waiting 1 min")
+                    time.sleep(sleep_timer)
+                    self.api_calls_this_hour = 1
+            except:
+                break
         self._build_df()
 
     def _get_next_page(self):
