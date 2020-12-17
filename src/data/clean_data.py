@@ -14,7 +14,7 @@ import sparse_dot_topn.sparse_dot_topn as ct
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 def _csv_to_df(path: str):
-    df = pd.read_csv("data/raw_data/" + path, index_col=0)
+    df = pd.read_csv(f"data/raw_data/{path}", index_col=0)
     df.fillna(value="", inplace=True)
     return df
     
@@ -130,7 +130,7 @@ def build_classes(path: str, lowest_similarity: float, ngram_size: int):
     count = 0
     name_list = []
     for i in range(len(column_list)+1):
-        name_list.append("cleaner" + str(i))   
+        name_list.append(f"cleaner{str(i)}")   
     replace = DataCleaner._replace_matches_df
     for column in column_list:
         print("Cleaning " + column + " column " + "of " + path)
@@ -145,6 +145,5 @@ def build_classes(path: str, lowest_similarity: float, ngram_size: int):
     return replace(name_list[count-1])  
 
 def return_df_as_csv(df, filename: str):
-    df = df.drop(df.columns[0], axis=1)
-    df.to_csv("data/cleaned_data/" + filename + ".csv")
+    df.to_csv(f"data/cleaned_data/{filename}")
 
