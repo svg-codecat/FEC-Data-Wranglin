@@ -5,6 +5,7 @@ certifi==2020.11.8
 chardet==3.0.4
 click==7.1.2
 colorama==0.4.4
+cython==0.29.21
 ftfy==5.8
 idna==2.10
 isort==5.6.4
@@ -19,6 +20,7 @@ python-dateutil==2.8.1
 pytz==2020.4
 regex==2020.11.13
 scipy==1.5.4
+setuptools==18.0
 six==1.15.0
 sklearn==0.0
 sparse_dot_topn==0.2.9
