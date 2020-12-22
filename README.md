@@ -1,6 +1,7 @@
 # FEC-Data-Wranglin
 `get_that_data.py` pulls data from FEC API
 `clean_that_data.py` finds duplicate values from the same column using [TF-IDF](https://en.wikipedia.org/wiki/Tf–idf)
+    i.e. "Not Employeed" is replaced by "Not Employed" or "Apple INC" is replaced with "Apple"
  
 If you want to make more than a handful of requests you need an api_key, visit [fec.gov](https://api.open.fec.gov/developers/#/) to get a key. 
 ***Set your api_key as an environment variable.*** 
@@ -25,6 +26,8 @@ Each row contains the information of one donation, the first five columns refere
 
 
 ## After gathering your data you can try to clean it up a little. 
+
+The process I have used for cleaning the data can be found [here](https://bergvca.github.io/2017/10/14/super-fast-string-matching.html)
 
 ### The more data you have the better the cleaning will work!
 

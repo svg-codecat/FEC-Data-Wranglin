@@ -28,7 +28,8 @@ def _get_df_columns(df):
 class DataCleaner:
     """
     Instantiated with a dataframe its column names, and size of lowest_similarity and ngram_size. 
-    DataCleaner methods to provide a smart deduplication of column values in a dataframe.
+    DataCleaner methods to provide a smart deduplication of column values in a dataframe. 
+        i.e. "Not Employeed" is replaced by "Not Employed" or "Apple INC" is replaced with "Apple"
     Utilizes a form of Term Frequency, Inverse Document Frequency to determine similarity between values.
 
 
@@ -61,7 +62,7 @@ class DataCleaner:
 
     def _ngrams(self, string):
         """
-        Takes input `string`, removes unwanted chars and returns a list of slices of input `string`.
+        Takes input `string`, removes non-alphabetic and non-ascii chars and returns a list of slices of input `string`.
 
         Parameters:
             String: A string to be chunked into size of self.ngram_size.
@@ -95,7 +96,7 @@ class DataCleaner:
         Thanks to ING BANK.
 
         ING definition:
-            This function will return a matrxi C in CSR format, where
+            This function will return a matrix C in CSR format, where
             C = [sorted top n results and results > lower_bound for each row of A * B]
                 Input:
                     A and B: two CSR matrix
@@ -164,17 +165,17 @@ class DataCleaner:
     
         left_side = np.empty([nr_matches], dtype=object)
         right_side = np.empty([nr_matches], dtype=object)
-        similairity = np.zeros(nr_matches)
+        similarity = np.zeros(nr_matches)
 
         for index in range(0, nr_matches):
             left_side[index] = name_vector[sparserows[index]]
             right_side[index] = name_vector[sparsecols[index]]
-            similairity[index] = sparse_matrix.data[index]
+            similarity[index] = sparse_matrix.data[index]
 
         return pd.DataFrame({
                         'left_side': left_side,
                         'right_side': right_side,
-                        'similairity': similairity
+                        'similarity': similarity
                         })
 
 
@@ -191,21 +192,23 @@ class DataCleaner:
         tf_idf_matrix = vectorizer.fit_transform(unique_names)
         matches = self._awesome_cossim_top(tf_idf_matrix, tf_idf_matrix.transpose(), 100)
         matches_df = self._get_matches_df(matches, unique_names)
-        matches_df = matches_df[matches_df['similairity'] < 0.99999] # Remove all exact matches
+        matches_df = matches_df[matches_df['similarity'] < 0.99999] # Remove all exact matches
         # Future improvement: Use the highest value count of either left or right side to determine which to use as final value.
         for left_side, right_side in zip(matches_df['left_side'], matches_df['right_side']):
+            left_count = len(self.df.loc[self.df[self.column_name] == left_side])
+            right_count = len(self.df.loc[self.df[self.column_name] == right_side])
             for position, column in zip(self.df.index, self.df[self.column_name]):
                 if column == right_side:
-                    self.df.at[position, self.column_name] = left_side
+                    if left_count > right_count:
+                        self.df.at[position, self.column_name] = left_side
         #print(len(self.df[self.column_name].unique())) # Uncomment to compare how many values have been combined
         return self.df
 
 
-def build_classes(path: str, lowest_similarity: float, ngram_size: int):
+def clean_data(path: str, lowest_similarity: float, ngram_size: int):
     """
     Takes a csv file and combines similar values using ngram_size to determine string chunk sizing.
-    Use return_df_as_csv(build_classes(path: str, lowest_similarity: float, ngram_size: int), filename: str)
-        to output a csv file.
+    
 
     Parameters:
         path: str
@@ -218,18 +221,21 @@ def build_classes(path: str, lowest_similarity: float, ngram_size: int):
             3 is normally best but values between 2 and 5 can work.
 
     Returns:
-        A Pandas Dataframe with all columns' values with similarity at or above lowest_similarity combined.
+        A csv file with all columns' values with similarity at or above lowest_similarity combined.
 
     """
     df = _csv_to_df(path)
     column_list = _get_df_columns(df)
     count = 0
     name_list = []
+    skip_list = ["contributor_city", "contributor_state", "contributor_zip", "party"]
     for i in range(len(column_list)+1):
         name_list.append(f"cleaner{str(i)}")   
     replace = DataCleaner._replace_matches_df
     for column in column_list:
-        print("Cleaning " + column + " column " + "of " + path)
+        if column in skip_list:
+            continue
+        print(f"Cleaning {column} column of {path}")
         if count < 1:
             name_list[count] = DataCleaner(df, lowest_similarity, column, ngram_size)
             count += 1
@@ -238,8 +244,8 @@ def build_classes(path: str, lowest_similarity: float, ngram_size: int):
         name_list[count] = DataCleaner(replace(name_list[count-1]), lowest_similarity, column, ngram_size)
         count += 1
         name_list[count-1]
-    return replace(name_list[count-1])  
+    write_df_as_csv(replace(name_list[count-1]), f"cleaned_{lowest_similarity}_{path}")
 
-def return_df_as_csv(df, filename: str):
+def write_df_as_csv(df, filename: str):
     df.to_csv(f"data/cleaned_data/{filename}")
 
