@@ -5,10 +5,11 @@ __pycache__/
 # development
 env/
 .vscode/
-FEC-Data-Wranglin.code-workspace
+
 
 # data
-data/*
-
+data/raw_data/*
+data/cleaned_data/*
 # keep
-!data/.gitkeep 
+!data/raw_data/.gitkeep 
+!data/cleaned_data/.gitkeep 
