@@ -1,0 +1,15 @@
+# python artifacts
+__pycache__/
+.ipynb_checkpoints/
+
+# development
+env/
+.vscode/
+
+
+# data
+data/raw_data/*
+data/cleaned_data/*
+# keep
+!data/raw_data/.gitkeep 
+!data/cleaned_data/.gitkeep 
