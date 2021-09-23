@@ -13,15 +13,22 @@ app = FastAPI(
 )
 
 # Instantiate templates path
-templates = Jinja2Templates(directory="viz/templates/")
+templates = Jinja2Templates(directory="src/viz/templates/")
 
+# Mount static files
+app.mount(
+    '/assets', StaticFiles(directory='src/viz/templates/assets/'), name='assets')
+app.mount(
+    '/images', StaticFiles(directory='src/viz/templates/images/'), name='images')
+
+# Define routes
 @app.get('/', response_class=HTMLResponse)
 def display_index(request: Request):
-    return templates.TemplateResponse('index.html', {'title': 'FEC Data Visualization'})
+    """
+    Displays the index page
+    """
+    return templates.TemplateResponse('index.html', {"request": request})
 
-app.mount('/assets', StaticFiles(directory='viz/templates/assets/'), name='assets')
-
-app.mount('/images', StaticFiles(directory='viz/templates/images/'), name='images')
 
 if __name__ == '__main__':
     uvicorn.run(app)
