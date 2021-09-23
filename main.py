@@ -29,6 +29,28 @@ def display_index(request: Request):
     """
     return templates.TemplateResponse('index.html', {"request": request})
 
+@app.get('/landing', response_class=HTMLResponse)
+def display_landing(request: Request):
+    """
+    Displays the landing page
+    """
+    return templates.TemplateResponse('landing.html', {"request": request})
+
+@app.get('/generic', response_class=HTMLResponse)
+def display_generic(request: Request):
+    """
+    Displays the index page
+    """
+    return templates.TemplateResponse('generic.html', {"request": request})
+
+@app.get('/elements', response_class=HTMLResponse)
+def display_elements(request: Request):
+    """
+    Displays the index page
+    """
+    return templates.TemplateResponse('elements.html', {"request": request})
+
+
 
 if __name__ == '__main__':
     uvicorn.run(app)
