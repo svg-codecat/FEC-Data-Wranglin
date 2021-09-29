@@ -1,3 +1,4 @@
+import os
 import uvicorn
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
@@ -55,7 +56,7 @@ def display_elements(request: Request):
     """
     Displays the map page
     """
-    return templates.TemplateResponse('map.html', {"request": request})
+    return templates.TemplateResponse('map.html', {"request": request, "MAPS_API_KEY": os.environ.get("MAPS_API_KEY")})
 
 @app.post('/generic')
 def display_map_results(request: Request, location: str=Form(...), locality: str=Form(...), administrative_area_level_1: str=Form(...), postal_code: str=Form(...), country: str=Form(...)):
