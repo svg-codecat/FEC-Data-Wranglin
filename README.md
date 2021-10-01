@@ -1,4 +1,7 @@
-# FEC-Data-Wranglin
+# This project is rapidly evolving and the README will be updated soon.
+
+
+## FEC-Data-Wranglin
 `get_that_data.py` pulls data from FEC API
 `clean_that_data.py` finds duplicate values from the same column using [TF-IDF](https://en.wikipedia.org/wiki/Tf–idf)
     i.e. "Not Employeed" is replaced by "Not Employed" or "Apple INC" is replaced with "Apple"
