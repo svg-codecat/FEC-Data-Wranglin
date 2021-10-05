@@ -41,6 +41,7 @@ Cython = "==0.29.21"
 aiofiles = "*"
 jinja2 = "*"
 python-multipart = "*"
+pydantic = "*"
 
 [dev-packages]
 
