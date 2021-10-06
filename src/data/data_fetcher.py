@@ -89,10 +89,6 @@ def _make_api_url(
         recipient_committee_type
     )
 
-    contributor_zip = _handle_contributor_zip(contributor_zip)
-
-    contributor_city = _handle_contributor_city(contributor_city)
-
     location_query = _handle_location_query(
         contributor_zip, contributor_state, contributor_city)
 
@@ -124,29 +120,16 @@ def _handle_recipient_committee_type(recipient_committee_type: str) -> str:
     return recipient_committee_type
 
 
-def _handle_contributor_zip(contributor_zip: str) -> str:
-    if contributor_zip.isnumeric():
-        return contributor_zip[:5]
-    else:
-        print("Invalid input, defaulting to None")
-        return None
-
-
-def _handle_contributor_city(contributor_city: str) -> str:
-    if contributor_city:
-        return contributor_city.upper()
-    else:
-        print("Invalid input, defaulting to None")
-        return None
-
-
 def _handle_location_query(contributor_zip: str, contributor_state: str, contributor_city: str) -> str:
     location_query = ""
     if contributor_zip:
-        location_query += f"&contributor_zip={contributor_zip}"
+        if contributor_zip.isnumeric():
+            contributor_zip = contributor_zip[:5]
+            location_query += f"&contributor_zip={contributor_zip}"
     if contributor_state:
         location_query += f"&contributor_state={contributor_state}"
     if contributor_city:
+        contributor_city = contributor_city.upper()
         location_query += f"&contributor_city={contributor_city}"
 
     return location_query
