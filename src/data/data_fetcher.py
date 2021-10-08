@@ -278,8 +278,12 @@ class DataFetcher:
 
             self.complete_list.append(
                 current_list := [
+                    committe_name := item["committee"]["name"],
+                    contribution_receipt_amount := item["contribution_receipt_amount"],
                     contributor_occupation := item["contributor_occupation"],
                     contributor_employer := item["contributor_employer"],
+                    contributor_street_1 := item["contributor_street_1"],
+                    contributor_street_2 := item["contributor_street_2"],
                     contributor_city := item["contributor_city"],
                     contributor_state := item["contributor_state"],
                     contributor_zip,
@@ -291,8 +295,12 @@ class DataFetcher:
         self.df = pd.DataFrame(
             self.complete_list,
             columns=[
+                "committee_name",
+                "contribution_receipt_amount",
                 "contributor_occupation",
                 "contributor_employer",
+                "contributor_street_1",
+                "contributor_street_2",
                 "contributor_city",
                 "contributor_state",
                 "contributor_zip",
