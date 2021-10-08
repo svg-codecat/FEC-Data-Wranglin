@@ -51,7 +51,7 @@ def _get_total_pages_for_call(api_starting_url_container: APIStartingURLContaine
 
 
 def _make_api_url(
-    two_year_transaction_period: int, recipient_committee_type: str, contributor_zip: int = None, contributor_state: str = None, contributor_city: str = None
+    two_year_transaction_period: int, recipient_committee_type: str, contributor_zip: str = None, contributor_state: str = None, contributor_city: str = None
 ) -> str:
     """
     Build the `starting_url` to get campaign donation receipt data of individual's donations for a two year time period.
@@ -89,7 +89,10 @@ def _make_api_url(
         recipient_committee_type
     )
 
-    starting_url = (f"{base_api_url}two_year_transaction_period={two_year_transaction_period}&api_key={api_key}&recipient_committee_type={recipient_committee_type}{set_parameters}"
+    location_query = _handle_location_query(
+        contributor_zip, contributor_state, contributor_city)
+
+    starting_url = (f"{base_api_url}two_year_transaction_period={two_year_transaction_period}&api_key={api_key}&recipient_committee_type={recipient_committee_type}{location_query}{set_parameters}"
                     )
     return APIStartingURLContainer(url=starting_url)
 
@@ -117,6 +120,21 @@ def _handle_recipient_committee_type(recipient_committee_type: str) -> str:
     return recipient_committee_type
 
 
+def _handle_location_query(contributor_zip: str, contributor_state: str, contributor_city: str) -> str:
+    location_query = ""
+    if contributor_zip:
+        if contributor_zip.isnumeric():
+            contributor_zip = contributor_zip[:5]
+            location_query += f"&contributor_zip={contributor_zip}"
+    if contributor_state:
+        location_query += f"&contributor_state={contributor_state}"
+    if contributor_city:
+        contributor_city = contributor_city.upper()
+        location_query += f"&contributor_city={contributor_city}"
+
+    return location_query
+
+
 class DataFetcher:
     """
     Instantiated with the year and President/Senate/House level you're interested in
@@ -138,12 +156,17 @@ class DataFetcher:
 
     """
 
-    def __init__(self, two_year_transaction_period: int, recipient_committee_type: str):
+    def __init__(self, two_year_transaction_period: int, recipient_committee_type: str, contributor_zip: str = None, contributor_state: str = None, contributor_city: str = None):
         self.api_starting_url_container = _make_api_url(
-            two_year_transaction_period, recipient_committee_type
+            two_year_transaction_period, recipient_committee_type, contributor_zip, contributor_state, contributor_city
         )
+
         self.two_year_transaction_period = two_year_transaction_period
         self.recipient_committee_type = recipient_committee_type
+        self.contributor_zip = contributor_zip
+        self.contributor_state = contributor_state
+        self.contributor_city = contributor_city
+
         self.total_pages = _get_total_pages_for_call(
             self.api_starting_url_container)
 
@@ -255,8 +278,12 @@ class DataFetcher:
 
             self.complete_list.append(
                 current_list := [
+                    committe_name := item["committee"]["name"],
+                    contribution_receipt_amount := item["contribution_receipt_amount"],
                     contributor_occupation := item["contributor_occupation"],
                     contributor_employer := item["contributor_employer"],
+                    contributor_street_1 := item["contributor_street_1"],
+                    contributor_street_2 := item["contributor_street_2"],
                     contributor_city := item["contributor_city"],
                     contributor_state := item["contributor_state"],
                     contributor_zip,
@@ -268,8 +295,12 @@ class DataFetcher:
         self.df = pd.DataFrame(
             self.complete_list,
             columns=[
+                "committee_name",
+                "contribution_receipt_amount",
                 "contributor_occupation",
                 "contributor_employer",
+                "contributor_street_1",
+                "contributor_street_2",
                 "contributor_city",
                 "contributor_state",
                 "contributor_zip",
@@ -281,9 +312,9 @@ class DataFetcher:
     def save_df_data(self):
         files = os.listdir("data/raw_data")
         for name in files:
-            if fnmatch.fnmatch(name, pattern := f"*_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv"):
+            if fnmatch.fnmatch(name, pattern := f"*_{self.recipient_committee_type}_in_{self.two_year_transaction_period}_for_{self.contributor_city}_{self.contributor_state}_{self.contributor_zip}.csv"):
                 os.remove("data/raw_data/" + name)
                 self.df.to_csv(
-                    f'data/raw_data/{self.pages_pulled}_of_{self.total_pages}_for_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv')
+                    f'data/raw_data/{self.pages_pulled}_of_{self.total_pages}_for_{self.recipient_committee_type}_in_{self.two_year_transaction_period}_for_{self.contributor_city}_{self.contributor_state}_{self.contributor_zip}.csv')
         self.df.to_csv(
-            f'data/raw_data/{self.pages_pulled}_of_{self.total_pages}_for_{self.recipient_committee_type}_in_{self.two_year_transaction_period}.csv')
+            f'data/raw_data/{self.pages_pulled}_of_{self.total_pages}_for_{self.recipient_committee_type}_in_{self.two_year_transaction_period}_for_{self.contributor_city}_{self.contributor_state}_{self.contributor_zip}.csv')

@@ -74,16 +74,13 @@ async def display_elements(request: Request):
     """
     return templates.TemplateResponse('map.html', {"request": request, "MAPS_API_KEY": os.environ.get("MAPS_API_KEY")})
 
-@app.post('/generic_test')
-async def test_generic(request: Request, location: str = Form(...), locality: str = Form(...), administrative_area_level_1: str = Form(...), postal_code: str = Form(...), country: str = Form(...)):
-    return f"{location} {locality} {administrative_area_level_1} {postal_code} {country}"
-
 
 @app.post('/generic', response_class=HTMLResponse)
 async def display_map_results(request: Request, ship_address: str = Form(...), locality: str = Form(...), state: str = Form(...), postcode: str = Form(...), country: str = Form(...)):
     """
     Displays the generic page with map results
     """
+
     return templates.TemplateResponse('generic.html',
                                         {"request": request,
                                         "ship_address": ship_address,
