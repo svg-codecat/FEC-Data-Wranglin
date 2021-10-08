@@ -42,6 +42,8 @@ aiofiles = "*"
 jinja2 = "*"
 python-multipart = "*"
 pydantic = "*"
+thefuzz = "*"
+python-levenshtein = "*"
 
 [dev-packages]
 
