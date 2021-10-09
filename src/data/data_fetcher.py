@@ -92,7 +92,7 @@ def _make_api_url(
     location_query = _handle_location_query(
         contributor_zip, contributor_state, contributor_city)
 
-    starting_url = (f"{base_api_url}two_year_transaction_period={two_year_transaction_period}&api_key={api_key}&recipient_committee_type={recipient_committee_type}{location_query}{set_parameters}"
+    starting_url = (f"{base_api_url}{two_year_transaction_period}&api_key={api_key}{recipient_committee_type}{location_query}{set_parameters}"
                     )
     return APIStartingURLContainer(url=starting_url)
 
@@ -103,21 +103,21 @@ def _handle_two_year_transaction_period(two_year_transaction_period: str):
         if two_year_transaction_period % 2 != 0:
             two_year_transaction_period = two_year_transaction_period + 1
         if two_year_transaction_period in range(2004, 2021):
-            return str(two_year_transaction_period)
+            return f"two_year_transaction_period={str(two_year_transaction_period)}"
     print("Invalid input, defaulting to 2020.")
-    return "2020"
+    return "two_year_transaction_period=2020"
 
 
 def _handle_recipient_committee_type(recipient_committee_type: str) -> str:
     possible_types = ["H", "HOUSE", "S", "SENATE", "P", "PRESIDENTIAL"]
     recipient_committee_type = recipient_committee_type.upper()
     if recipient_committee_type in possible_types:
-        return recipient_committee_type[:1]
+        return f"&recipient_committee_type={recipient_committee_type[:1]}"
+    elif recipient_committee_type in ["A", "ALL"]:
+        return "&recipient_committee_type=H&recipient_committee_type=P&recipient_committee_type=S&recipient_committee_type=V&recipient_committee_type=W"
     else:
         print("Invalid input, defaulting to Presidential")
-        recipient_committee_type = "P"
-
-    return recipient_committee_type
+        return "&recipient_committee_type=P"
 
 
 def _handle_location_query(contributor_zip: str, contributor_state: str, contributor_city: str) -> str:

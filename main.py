@@ -6,6 +6,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
+from src.data.data_fetcher import DataFetcher
+
 
 # Instantiate fastAPI with appropriate descriptors
 app = FastAPI(
@@ -24,13 +26,6 @@ app.mount(
 app.mount(
     '/images', StaticFiles(directory='src/viz/templates/images/'), name='images')
 
-
-class AddressFormData(BaseModel):
-    location: str=Form(...)
-    locality: str=Form(...)
-    administrative_area_level_1: str=Form(...)
-    postal_code: str=Form(...)
-    country: str=Form(...)
 
 # Define routes
 
@@ -76,13 +71,25 @@ async def display_elements(request: Request):
 
 
 @app.post('/generic', response_class=HTMLResponse)
-async def display_map_results(request: Request, ship_address: str = Form(...), locality: str = Form(...), state: str = Form(...), postcode: str = Form(...), country: str = Form(...)):
+async def display_map_results(request: Request,
+                            election_year: str = Form(...),
+                            election_type: str = Form(...),
+                            ship_address: str = Form(...),
+                            locality: str = Form(...),
+                            state: str = Form(...),
+                            postcode: str = Form(...),
+                            country: str = Form(...)):
     """
     Displays the generic page with map results
     """
-
+    fetcher = DataFetcher(election_year, election_type, None, state, None)
+    fetcher.api_starting_url_container
+    fetcher.gimmie_data(record_limit=100)
+    fetcher.save_df_data() 
     return templates.TemplateResponse('generic.html',
                                         {"request": request,
+                                        "election_year": election_year,
+                                        "election_type": election_type,
                                         "ship_address": ship_address,
                                         "locality": locality,
                                         "state": state,
