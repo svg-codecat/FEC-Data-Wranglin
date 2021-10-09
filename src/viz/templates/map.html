@@ -168,10 +168,20 @@
   </head>
     <body>
       <form id="local_doantion-form" action="/generic" method="post" autocomplete="off">
-        <p class="title">Sample address form for North America</p>
+        <h4>Enter an election year between 2004 and 2022</h4>
+        <input id="election_year" name="election_year" />
+        <h4>Enter election type.</h4>
+        <ul>
+          <li>A for all donation info</li>
+          <li>H for only direct donations to House of Representitives campaigns</li>
+          <li>S for direct donations to Senate campaigns</li>
+          <li>P for direct donations to Presidential campaigns</li>
+        </ul>
+        <input id="election_type" name="election_type" />
+        <p class="title">Search political donations around you!</p>
         <label class="full-field">
           <!-- Avoid the word "address" in id, name, or label text to avoid browser autofill from conflicting with Place Autocomplete. Star or comment bug https://crbug.com/587466 to request Chromium to honor autocomplete="off" attribute. -->
-          <span class="form-label">Your Address</span>
+          <span class="form-label">Your location</span>
           <input
             id="ship_address"
             name="ship_address"
@@ -179,10 +189,10 @@
             autocomplete="off"
           />
         </label>
-        <input type="hidden" id="address2" name="address2" />
-        <input type="hidden" id="locality" name="locality" required/>
-        <input type="hidden" id="state" name="state" required />
-        <input type="hidden" id="postcode" name="postcode" required />
+        <input id="address2" name="address2" />
+        <input id="locality" name="locality" required/>
+        <input id="state" name="state" required />
+        <input id="postcode" name="postcode" required />
         <input type="hidden" id="country" name="country" required />
         <button type="submit" class="my-button">See Local Overview</button>
       </form>
