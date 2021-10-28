@@ -44,6 +44,7 @@ python-multipart = "*"
 pydantic = "*"
 thefuzz = "*"
 python-levenshtein = "*"
+terminable-thread = "*"
 
 [dev-packages]
 
