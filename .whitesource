@@ -12,7 +12,12 @@
   "issueSettings": {
     "minSeverityLevel": "LOW"
   },
-  "remediateSettings": {
-    "enableRenovate": true
+   "remediateSettings": {
+    "enableRenovate": true,
+    "labels": ["dependencies"],
+    "extends": ["github>whitesource/merge-confidence:beta"],
+    "dependencyDashboard": true,
+    "dependencyDashboardAutoclose": true,
+    "includeForks": true
   }
 }
