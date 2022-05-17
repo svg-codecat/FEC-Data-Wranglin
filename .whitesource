@@ -14,7 +14,7 @@
   },
    "remediateSettings": {
     "enableRenovate": true,
-    "labels": ["dependencies"],
+    "labels": ["deps"],
     "extends": ["github>whitesource/merge-confidence:beta"],
     "dependencyDashboard": true,
     "dependencyDashboardAutoclose": true,
